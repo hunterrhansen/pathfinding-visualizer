@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import Node from "./node/Node";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
+import { breadthFirstSearch } from "../algorithms/bfs";
+import { depthFirstSearch } from "../algorithms/dfs";
+import { astar } from "../algorithms/astar";
 
 import "./Pathfinder.css";
 
@@ -13,12 +16,12 @@ import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
 
-const NUM_ROWS = 11;
-const NUM_COLS = 20;
+const NUM_ROWS = 25;
+const NUM_COLS = 50;
 const START_NODE_ROW = 5;
-const START_NODE_COL = 3;
-const FINISH_NODE_COL = 16;
+const START_NODE_COL = 4;
 const FINISH_NODE_ROW = 5; 
+const FINISH_NODE_COL = 15;
 
 export default class Pathfinder extends Component {
   constructor(props) {
@@ -111,10 +114,29 @@ export default class Pathfinder extends Component {
   visualizeDijkstra(grid, startNode, finishNode) {
     const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
+    this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
-  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
+  visualizeBFS(grid, startNode, finishNode) {
+    const visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    console.log(visitedNodesInOrder);
+    this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
+  visualizeDFS(grid, startNode, finishNode) {
+    const visitedNodesInOrder = depthFirstSearch(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
+  visualizeAStar(grid, startNode, finishNode) {
+    const visitedNodesInOrder = astar(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
+  animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder) {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
@@ -278,6 +300,7 @@ function createNode(row, col) {
     isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
     isVisited: false,
     distance: Infinity,
+    heuristic: Infinity,
     isWall: false,
     previousNode: null
   };
