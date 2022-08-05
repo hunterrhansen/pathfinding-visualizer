@@ -4,6 +4,7 @@ import { dijkstra } from "../algorithms/dijkstra";
 import { breadthFirstSearch } from "../algorithms/breadthfirstsearch";
 import { depthFirstSearch } from "../algorithms/depthfirstsearch";
 import { astar } from "../algorithms/astar";
+import { greedyBestFirstSearch } from "../algorithms/bestfirstsearch";
 import { getNodesInShortestPathOrder } from "../algorithms/index";
 
 import "./Pathfinder.css";
@@ -107,6 +108,8 @@ export default class Pathfinder extends Component {
       this.visualizeDijkstra(grid, start, finish);
     } else if (algorithm === "A*") {
       this.visualizeAStar(grid, start, finish);
+    } else if (algorithm === "GBFS") {
+      this.visualizeGreedyBestFirstSearch(grid, start, finish);
     }
   }
 
@@ -130,6 +133,12 @@ export default class Pathfinder extends Component {
 
   visualizeAStar(grid, startNode, finishNode) {
     const visitedNodesInOrder = astar(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
+  visualizeGreedyBestFirstSearch(grid, startNode, finishNode) {
+    const visitedNodesInOrder = greedyBestFirstSearch(grid, startNode, finishNode);
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
   }
@@ -207,7 +216,10 @@ export default class Pathfinder extends Component {
                   Dijkstra
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => this.setState({ algorithm: "A*" })}>
-                  A*
+                  A* Search
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => this.setState({ algorithm: "GBFS" })}>
+                  Greedy Best First Search
                 </Dropdown.Item>
               </DropdownButton>
               <Button variant="dark" className="mx-1" onClick={() => this.resetGrid()}>

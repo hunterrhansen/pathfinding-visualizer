@@ -1,4 +1,4 @@
-import { getAllNodes, getTraversableNeighbors } from ".";
+import { getAllNodes, getTraversableNeighbors, heuristic } from ".";
 
 export function astar(grid, startNode, endNode) {
   const visitedNodesInOrder = []; // closed list
@@ -15,14 +15,6 @@ export function astar(grid, startNode, endNode) {
     if (closestNode === endNode) return visitedNodesInOrder; // if we reach the end node, we're done
     updateUnvisitedNeighbors(closestNode, grid, endNode); // update unvisited neighbors
   }
-}
-
-function heuristic(node, endNode) {
-  const {row: row1, col: col1} = node;
-  const {row: row2, col: col2} = endNode;
-  const rowDistance = Math.abs(row1 - row2);
-  const colDistance = Math.abs(col1 - col2);
-  return rowDistance + colDistance;
 }
 
 // sort nodes by f-cost and h-cost

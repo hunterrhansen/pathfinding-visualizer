@@ -27,3 +27,11 @@ export function getTraversableNeighbors(node, grid) {
   if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
   return neighbors.filter(neighbor => !neighbor.isVisited && !neighbor.isWall);
 }
+
+export function heuristic(node, endNode) {
+  const {row: row1, col: col1} = node;
+  const {row: row2, col: col2} = endNode;
+  const rowDistance = Math.abs(row1 - row2);
+  const colDistance = Math.abs(col1 - col2);
+  return rowDistance + colDistance;
+}
