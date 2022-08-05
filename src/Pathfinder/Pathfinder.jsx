@@ -17,11 +17,11 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
 
 const NUM_ROWS = 25;
-const NUM_COLS = 50;
-const START_NODE_ROW = 5;
-const START_NODE_COL = 4;
-const FINISH_NODE_ROW = 5; 
-const FINISH_NODE_COL = 15;
+const NUM_COLS = NUM_ROWS * 2;
+const START_NODE_ROW = Math.ceil(NUM_ROWS / 2) - 1;
+const START_NODE_COL = Math.ceil(NUM_COLS / 10);
+const FINISH_NODE_ROW = START_NODE_ROW; 
+const FINISH_NODE_COL = NUM_COLS - START_NODE_COL - 1;
 
 export default class Pathfinder extends Component {
   constructor(props) {
@@ -49,8 +49,6 @@ export default class Pathfinder extends Component {
       grid: grid,
       startNode: { row: START_NODE_ROW, col: START_NODE_COL },
       finishNode: { row: FINISH_NODE_ROW, col: FINISH_NODE_COL },
-      algorithm: "Dijkstra",
-      object: "Wall"
     });
   }
 

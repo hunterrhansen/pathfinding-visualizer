@@ -1,64 +1,61 @@
-export function astar(grid, startNode, finishNode) {
-  const visitedNodesInOrder = [];
-  startNode.distance = 0;
-  startNode.heuristic = manhattanDistanceToFinish(startNode, finishNode);
-
-  const unvisitedNodes = getAllNodes(grid);
+export function astar(grid, startNode, endNode) {
+  const visitedNodesInOrder = []; // closed list
+  const unvisitedNodes = getAllNodes(grid); // open list
+  startNode.distance = 0; // g-cost, distance from start node to current node
+  startNode.heuristic = heuristic(startNode, endNode); // h-cost, distance from current node to end node
 
   while (!!unvisitedNodes.length) {
-    sortNodesByDistanceAndHeuristic(unvisitedNodes);
-    const closestNode = unvisitedNodes.shift();
-    if (closestNode.isWall) continue;
-    closestNode.isVisited = true;
-    visitedNodesInOrder.push(closestNode);
-    if (closestNode === finishNode) return visitedNodesInOrder;
-    updateUnvisitedNeighbors(closestNode, grid, finishNode);
+    sortNodesByFCost(unvisitedNodes);
+    const closestNode = unvisitedNodes.shift(); // grab next node from open list (lowest f-cost and h-cost)
+    if (closestNode.distance === Infinity) return visitedNodesInOrder; // if we encounter a node with distance of infinity, we must be trapped and should therefore stop
+    closestNode.isVisited = true; // add to closed list
+    visitedNodesInOrder.push(closestNode); // add to path
+    if (closestNode === endNode) return visitedNodesInOrder; // if we reach the end node, we're done
+    updateUnvisitedNeighbors(closestNode, grid, endNode); // update unvisited neighbors
   }
 }
 
-function sortNodesByDistanceAndHeuristic(unvisitedNodes) {
+function heuristic(node, endNode) {
+  const {row: row1, col: col1} = node;
+  const {row: row2, col: col2} = endNode;
+  const rowDistance = Math.abs(row1 - row2);
+  const colDistance = Math.abs(col1 - col2);
+  return rowDistance + colDistance;
+}
+
+// sort nodes by f-cost and h-cost
+function sortNodesByFCost(unvisitedNodes) {
   unvisitedNodes.sort((nodeA, nodeB) => {
-    const distanceA = nodeA.distance + nodeA.heuristic;
-    const distanceB = nodeB.distance + nodeB.heuristic;
-    return distanceA - distanceB;
+    const f1 = nodeA.distance + nodeA.heuristic;
+    const f2 = nodeB.distance + nodeB.heuristic;
+    if (f1 === f2) {
+      const h1 = nodeA.heuristic;
+      const h2 = nodeB.heuristic;
+      return h1 - h2;
+    }
+    return f1 - f2;
   });
 }
 
-function manhattanDistanceToFinish(currentNode, finishNode) {
-  const xDistance = Math.abs(currentNode.col - finishNode.col);
-  const yDistance = Math.abs(currentNode.row - finishNode.row);
-  return xDistance + yDistance;
-}
-
-function updateUnvisitedNeighbors(node, grid, finishNode) {
-  const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
-
-  let closestNode = null;
-  let closest = Infinity;
-
-  for (const neighbor of unvisitedNeighbors) {
-    neighbor.distance = node.distance + 1;
-    neighbor.previousNode = node;
-    let currentHeuristic = manhattanDistanceToFinish(neighbor, finishNode);
-    if (currentHeuristic < closest) {
-      closest = currentHeuristic;
-      closestNode = neighbor;
+function updateUnvisitedNeighbors(node, grid, endNode) {
+  const traversableNeighbors = getTraversableNeighbors(node, grid);
+  for (const neighbor of traversableNeighbors) {
+    if (heuristic(neighbor, endNode) < neighbor.heuristic) {
+      neighbor.heuristic = heuristic(neighbor, endNode);
+      neighbor.previousNode = node;
+      neighbor.distance = node.distance + 1;
     }
   }
-
-  if (closestNode !== null) {
-    closestNode.heuristic = closest;
-  }
 }
 
-function getUnvisitedNeighbors(node, grid) {
+function getTraversableNeighbors(node, grid) {
   const neighbors = [];
   const {col, row} = node;
   if (row > 0) neighbors.push(grid[row - 1][col]);
   if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
   if (col > 0) neighbors.push(grid[row][col - 1]);
   if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
-  return neighbors.filter(neighbor => !neighbor.isVisited);
+  return neighbors.filter(neighbor => !neighbor.isWall && !neighbor.isVisited);
 }
 
 function getAllNodes(grid) {
