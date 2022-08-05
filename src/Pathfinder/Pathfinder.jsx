@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import Node from "./node/Node";
-import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
-import { breadthFirstSearch } from "../algorithms/bfs";
-import { depthFirstSearch } from "../algorithms/dfs";
+import { dijkstra } from "../algorithms/dijkstra";
+import { breadthFirstSearch } from "../algorithms/breadthfirstsearch";
+import { depthFirstSearch } from "../algorithms/depthfirstsearch";
 import { astar } from "../algorithms/astar";
+import { getNodesInShortestPathOrder } from "../algorithms/index";
 
 import "./Pathfinder.css";
 
@@ -118,7 +119,6 @@ export default class Pathfinder extends Component {
   visualizeBFS(grid, startNode, finishNode) {
     const visitedNodesInOrder = breadthFirstSearch(grid, startNode, finishNode);
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    console.log(visitedNodesInOrder);
     this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
