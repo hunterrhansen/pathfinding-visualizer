@@ -37,7 +37,7 @@ function updateUnvisitedNeighbors(node, grid, endNode) {
     if (heuristic(neighbor, endNode) < neighbor.heuristic) {
       neighbor.heuristic = heuristic(neighbor, endNode);
       neighbor.previousNode = node;
-      neighbor.distance = node.distance + 1;
+      neighbor.distance = node.distance + neighbor.weight;
     }
   }
 }

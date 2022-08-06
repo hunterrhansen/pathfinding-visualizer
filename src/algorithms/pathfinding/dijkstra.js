@@ -1,9 +1,10 @@
 import { getAllNodes, getTraversableNeighbors } from ".";
 
 export function dijkstra(grid, startNode, finishNode) {
-  const visitedNodesInOrder = [];
-  startNode.distance = 0;
-  const unvisitedNodes = getAllNodes(grid);
+  const visitedNodesInOrder = []; // closed list
+  const unvisitedNodes = getAllNodes(grid); // open list
+  startNode.distance = 1; // g-cost, distance from start node to current node
+
   while (!!unvisitedNodes.length) {
     sortNodesByDistance(unvisitedNodes);
     const closestNode = unvisitedNodes.shift();
@@ -25,7 +26,7 @@ function sortNodesByDistance(unvisitedNodes) {
 function updateUnvisitedNeighbors(node, grid) {
   const unvisitedNeighbors = getTraversableNeighbors(node, grid);
   for (const neighbor of unvisitedNeighbors) {
-    neighbor.distance = node.distance;
+    neighbor.distance = node.distance + neighbor.weight;
     neighbor.previousNode = node;
   }
 }

@@ -1,14 +1,23 @@
 import React, { Component } from "react";
 import Node from "./node/Node";
-import { dijkstra } from "../algorithms/dijkstra";
-import { breadthFirstSearch } from "../algorithms/breadthfirstsearch";
-import { depthFirstSearch } from "../algorithms/depthfirstsearch";
-import { astar } from "../algorithms/astar";
-import { greedyBestFirstSearch } from "../algorithms/bestfirstsearch";
-import { getNodesInShortestPathOrder } from "../algorithms/index";
+import {
+  getNodesInShortestPathOrder,
+  dijkstra,
+  astar,
+  breadthFirstSearch,
+  greedyBestFirstSearch,
+  depthFirstSearch,
+  recursiveDivisionMaze
+} from "../algorithms/index";
 
 import "./Pathfinder.css";
-import { FaWeightHanging, FaFlag, FaPlay, FaRedo, FaArrowDown } from "react-icons/fa";
+import {
+  FaWeightHanging,
+  FaFlag,
+  FaPlay,
+  FaRedo,
+  FaArrowDown,
+} from "react-icons/fa";
 import { GiBrickWall } from "react-icons/gi";
 
 import Container from "react-bootstrap/Container";
@@ -177,8 +186,14 @@ export default class Pathfinder extends Component {
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
-        document.getElementById(`node-${node.row}-${node.col}`).className =
-          "node node-visited";
+        const nodeElement = document.getElementById(
+          `node-${node.row}-${node.col}`
+        );
+        if (node.weight === 1) {
+          nodeElement.className = "node node-visited";
+        } else {
+          nodeElement.className = "node node-visited-weight";
+        }
       }, 10 * i);
     }
   }
@@ -187,9 +202,28 @@ export default class Pathfinder extends Component {
     for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
       setTimeout(() => {
         const node = nodesInShortestPathOrder[i];
-        document.getElementById(`node-${node.row}-${node.col}`).className =
-          "node node-shortest-path";
+        const nodeElement = document.getElementById(
+          `node-${node.row}-${node.col}`
+        );
+        if (node.weight === 1) {
+          nodeElement.className = "node node-shortest-path";
+        } else {
+          nodeElement.className = "node node-shortest-path-weight";
+        }
       }, 50 * i);
+    }
+  }
+
+  handleGenerateMaze() {
+    const { grid, startNode, finishNode } = this.state;
+    const visitedNodesInOrder = recursiveDivisionMaze(grid);
+    console.log(visitedNodesInOrder)
+    for (let i = 0; i < visitedNodesInOrder.length; i++) {
+      setTimeout(() => {
+        const node = visitedNodesInOrder[i];
+        const newGrid = getNewGridWithWallToggled(this.state.grid, node.row, node.col);
+        this.setState({ grid: newGrid });
+      }, 10 * i);
     }
   }
 
@@ -207,14 +241,17 @@ export default class Pathfinder extends Component {
                 <GiBrickWall />
                 Wall
               </Button>
-              <Button
-                variant="outline-dark"
-                onClick={() => this.setState({ object: "Weight" })}
-                active={this.state.object === "Weight"}
-              >
-                <FaWeightHanging />
-                Weight
-              </Button>
+              {(this.state.algorithm === "Dijkstra" ||
+                this.state.algorithm === "A*") && (
+                <Button
+                  variant="outline-dark"
+                  onClick={() => this.setState({ object: "Weight" })}
+                  active={this.state.object === "Weight"}
+                >
+                  <FaWeightHanging />
+                  Weight
+                </Button>
+              )}
               <Button
                 variant="outline-danger"
                 onClick={() => this.setState({ object: "Start" })}
@@ -235,6 +272,9 @@ export default class Pathfinder extends Component {
           </Col>
           <Col>
             <ButtonToolbar>
+              <Button onClick={() => this.handleGenerateMaze()}>
+                Generate Maze
+              </Button>
               <DropdownButton
                 variant="outline-dark"
                 className="mx-1"
@@ -281,7 +321,7 @@ export default class Pathfinder extends Component {
                 onClick={() => this.handleVisualize()}
               >
                 <FaPlay />
-                Visualize
+                Visualize {this.state.algorithm}
               </Button>
             </ButtonToolbar>
           </Col>
@@ -293,7 +333,8 @@ export default class Pathfinder extends Component {
                 return (
                   <div key={rowIdx} className="grid-row">
                     {row.map((node, nodeIdx) => {
-                      const { row, col, isStart, isFinish, isWall, weight } = node;
+                      const { row, col, isStart, isFinish, isWall, weight } =
+                        node;
                       return (
                         <Node
                           key={nodeIdx}
@@ -389,7 +430,7 @@ function getNewGridWithWeightToggled(grid, row, col) {
   const node = newGrid[row][col];
   const newNode = {
     ...node,
-    weight: node.weight === 1 ? 2 : 1,
+    weight: node.weight === 1 ? 3 : 1,
   };
   newGrid[row][col] = newNode;
   return newGrid;

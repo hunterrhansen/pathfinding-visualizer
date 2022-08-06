@@ -1,9 +1,9 @@
 import { getTraversableNeighbors } from ".";
 
 export function depthFirstSearch(grid, startNode, finishNode) {
-  const visitedNodesInOrder = [];
+  const visitedNodesInOrder = []; // closed list
+  const stack = [startNode]; // open list
 
-  const stack = [startNode];
   while (stack.length > 0) {
     const node = stack.pop();
 
