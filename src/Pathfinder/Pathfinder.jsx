@@ -8,6 +8,8 @@ import { greedyBestFirstSearch } from "../algorithms/bestfirstsearch";
 import { getNodesInShortestPathOrder } from "../algorithms/index";
 
 import "./Pathfinder.css";
+import { FaWeightHanging, FaFlag, FaPlay, FaRedo, FaArrowDown } from "react-icons/fa";
+import { GiBrickWall } from "react-icons/gi";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -18,11 +20,11 @@ import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
 
-const NUM_ROWS = 25;
+const NUM_ROWS = 20;
 const NUM_COLS = NUM_ROWS * 2;
 const START_NODE_ROW = Math.ceil(NUM_ROWS / 2) - 1;
 const START_NODE_COL = Math.ceil(NUM_COLS / 10);
-const FINISH_NODE_ROW = START_NODE_ROW; 
+const FINISH_NODE_ROW = START_NODE_ROW;
 const FINISH_NODE_COL = NUM_COLS - START_NODE_COL - 1;
 
 export default class Pathfinder extends Component {
@@ -34,7 +36,7 @@ export default class Pathfinder extends Component {
       startNode: { row: START_NODE_ROW, col: START_NODE_COL },
       finishNode: { row: FINISH_NODE_ROW, col: FINISH_NODE_COL },
       algorithm: "Dijkstra",
-      object: "Wall"
+      object: "Wall",
     };
   }
 
@@ -59,33 +61,52 @@ export default class Pathfinder extends Component {
     if (this.state.object === "Wall") {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid });
-    }
-    else if (this.state.object === "Start") {
+    } else if (this.state.object === "Weight") {
+      const newGrid = getNewGridWithWeightToggled(this.state.grid, row, col);
+      this.setState({ grid: newGrid });
+    } else if (this.state.object === "Start") {
       const newNode = { row, col };
-      const newGrid = getNewGridWithStartToggled(this.state.grid, newNode, this.state.startNode);
+      const newGrid = getNewGridWithStartToggled(
+        this.state.grid,
+        newNode,
+        this.state.startNode
+      );
       this.setState({ grid: newGrid, startNode: { row, col } });
-    } else if (this.state.object === "End") {
+    } else if (this.state.object === "Finish") {
       const newNode = { row, col };
-      const newGrid = getNewGridWithFinishToggled(this.state.grid, newNode, this.state.finishNode);
+      const newGrid = getNewGridWithFinishToggled(
+        this.state.grid,
+        newNode,
+        this.state.finishNode
+      );
       this.setState({ grid: newGrid, finishNode: { row, col } });
     }
   }
 
   handleMouseEnter(row, col) {
     if (!this.state.mouseIsPressed) return;
-    
+
     if (this.state.object === "Wall") {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid });
-    }
-    else if (this.state.object === "Start") {
+    } else if (this.state.object === "Weight") {
+      const newGrid = getNewGridWithWeightToggled(this.state.grid, row, col);
+      this.setState({ grid: newGrid });
+    } else if (this.state.object === "Start") {
       const newNode = { row, col };
-      const newGrid = getNewGridWithStartToggled(this.state.grid, newNode, this.state.startNode);
+      const newGrid = getNewGridWithStartToggled(
+        this.state.grid,
+        newNode,
+        this.state.startNode
+      );
       this.setState({ grid: newGrid, startNode: { row, col } });
-    }
-    else if (this.state.object === "End") {
+    } else if (this.state.object === "Finish") {
       const newNode = { row, col };
-      const newGrid = getNewGridWithFinishToggled(this.state.grid, newNode, this.state.finishNode);
+      const newGrid = getNewGridWithFinishToggled(
+        this.state.grid,
+        newNode,
+        this.state.finishNode
+      );
       this.setState({ grid: newGrid, finishNode: { row, col } });
     }
   }
@@ -98,7 +119,6 @@ export default class Pathfinder extends Component {
     const { grid, startNode, finishNode, algorithm } = this.state;
     const start = grid[startNode.row][startNode.col];
     const finish = grid[finishNode.row][finishNode.col];
-
 
     if (algorithm === "BFS") {
       this.visualizeBFS(grid, start, finish);
@@ -138,7 +158,11 @@ export default class Pathfinder extends Component {
   }
 
   visualizeGreedyBestFirstSearch(grid, startNode, finishNode) {
-    const visitedNodesInOrder = greedyBestFirstSearch(grid, startNode, finishNode);
+    const visitedNodesInOrder = greedyBestFirstSearch(
+      grid,
+      startNode,
+      finishNode
+    );
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateVisitedNodes(visitedNodesInOrder, nodesInShortestPathOrder);
   }
@@ -177,24 +201,35 @@ export default class Pathfinder extends Component {
             <ButtonGroup>
               <Button
                 variant="outline-secondary"
-                onClick={() => this.setState({ object: "Wall"})}
+                onClick={() => this.setState({ object: "Wall" })}
                 active={this.state.object === "Wall"}
               >
+                <GiBrickWall />
                 Wall
               </Button>
               <Button
+                variant="outline-dark"
+                onClick={() => this.setState({ object: "Weight" })}
+                active={this.state.object === "Weight"}
+              >
+                <FaWeightHanging />
+                Weight
+              </Button>
+              <Button
                 variant="outline-danger"
-                onClick={() => this.setState({ object: "Start"})}
+                onClick={() => this.setState({ object: "Start" })}
                 active={this.state.object === "Start"}
               >
+                <FaArrowDown />
                 Start
               </Button>
               <Button
                 variant="outline-success"
-                onClick={() => this.setState({ object: "End"})}
-                active={this.state.object === "End"}
+                onClick={() => this.setState({ object: "Finish" })}
+                active={this.state.object === "Finish"}
               >
-                End
+                <FaFlag />
+                Finish
               </Button>
             </ButtonGroup>
           </Col>
@@ -206,26 +241,46 @@ export default class Pathfinder extends Component {
                 id="algorithm-dropdown"
                 title={this.state.algorithm}
               >
-                <Dropdown.Item onClick={() => this.setState({ algorithm: "BFS" })}>
+                <Dropdown.Item
+                  onClick={() => this.setState({ algorithm: "BFS" })}
+                >
                   Breadth First Search
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => this.setState({ algorithm: "DFS" })}>
+                <Dropdown.Item
+                  onClick={() => this.setState({ algorithm: "DFS" })}
+                >
                   Depth First Search
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => this.setState({ algorithm: "Dijkstra" })}>
+                <Dropdown.Item
+                  onClick={() => this.setState({ algorithm: "Dijkstra" })}
+                >
                   Dijkstra
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => this.setState({ algorithm: "A*" })}>
+                <Dropdown.Item
+                  onClick={() => this.setState({ algorithm: "A*" })}
+                >
                   A* Search
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => this.setState({ algorithm: "GBFS" })}>
+                <Dropdown.Item
+                  onClick={() => this.setState({ algorithm: "GBFS" })}
+                >
                   Greedy Best First Search
                 </Dropdown.Item>
               </DropdownButton>
-              <Button variant="dark" className="mx-1" onClick={() => this.resetGrid()}>
+              <Button
+                variant="dark"
+                className="mx-1"
+                onClick={() => this.resetGrid()}
+              >
+                <FaRedo />
                 Reset
               </Button>
-              <Button variant="success" className="mx-1" onClick={() => this.handleVisualize()}>
+              <Button
+                variant="success"
+                className="mx-1"
+                onClick={() => this.handleVisualize()}
+              >
+                <FaPlay />
                 Visualize
               </Button>
             </ButtonToolbar>
@@ -238,7 +293,7 @@ export default class Pathfinder extends Component {
                 return (
                   <div key={rowIdx} className="grid-row">
                     {row.map((node, nodeIdx) => {
-                      const { row, col, isStart, isFinish, isWall } = node;
+                      const { row, col, isStart, isFinish, isWall, weight } = node;
                       return (
                         <Node
                           key={nodeIdx}
@@ -247,7 +302,10 @@ export default class Pathfinder extends Component {
                           isStart={isStart}
                           isFinish={isFinish}
                           isWall={isWall}
-                          onMouseDown={() => this.handleMouseDown(rowIdx, nodeIdx)}
+                          weight={weight}
+                          onMouseDown={() =>
+                            this.handleMouseDown(rowIdx, nodeIdx)
+                          }
                           onMouseUp={() => this.handleMouseUp(rowIdx, nodeIdx)}
                           onMouseOver={() =>
                             this.handleMouseEnter(rowIdx, nodeIdx)
@@ -258,10 +316,9 @@ export default class Pathfinder extends Component {
                   </div>
                 );
               })}
-            </div>            
+            </div>
           </Col>
         </Row>
-
       </Container>
     );
   }
@@ -286,18 +343,17 @@ function resetVisitedNodes() {
     for (let col = 0; col < NUM_COLS; col++) {
       if (row === START_NODE_ROW && col === START_NODE_COL) {
         document.getElementById(`node-${row}-${col}`).className =
-        "node node-start";
+          "node node-start";
         continue;
       }
 
       if (row === FINISH_NODE_ROW && col === FINISH_NODE_COL) {
         document.getElementById(`node-${row}-${col}`).className =
-        "node node-finish";
+          "node node-finish";
         continue;
       }
 
-      document.getElementById(`node-${row}-${col}`).className =
-      "node";
+      document.getElementById(`node-${row}-${col}`).className = "node";
     }
   }
 }
@@ -312,7 +368,8 @@ function createNode(row, col) {
     distance: Infinity,
     heuristic: Infinity,
     isWall: false,
-    previousNode: null
+    weight: 1,
+    previousNode: null,
   };
 }
 
@@ -327,6 +384,17 @@ function getNewGridWithWallToggled(grid, row, col) {
   return newGrid;
 }
 
+function getNewGridWithWeightToggled(grid, row, col) {
+  const newGrid = grid.slice();
+  const node = newGrid[row][col];
+  const newNode = {
+    ...node,
+    weight: node.weight === 1 ? 2 : 1,
+  };
+  newGrid[row][col] = newNode;
+  return newGrid;
+}
+
 function getNewGridWithStartToggled(grid, newNode, oldNode) {
   const newGrid = grid.slice();
 
@@ -334,7 +402,7 @@ function getNewGridWithStartToggled(grid, newNode, oldNode) {
   const changedOld = {
     ...oldStart,
     isStart: false,
-  }
+  };
   newGrid[oldNode.row][oldNode.col] = changedOld;
 
   const { row, col } = newNode;
@@ -355,7 +423,7 @@ function getNewGridWithFinishToggled(grid, newNode, oldNode) {
   const changedOld = {
     ...oldFinish,
     isFinish: false,
-  }
+  };
   newGrid[oldNode.row][oldNode.col] = changedOld;
 
   const { row, col } = newNode;

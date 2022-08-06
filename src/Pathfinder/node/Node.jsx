@@ -3,8 +3,8 @@ import "./Node.css";
 
 export default class Node extends Component {
   render() {
-    const { row, col, isStart, isFinish, isWall, onMouseDown, onMouseOver, onMouseUp } = this.props;
-    const cssClass = isStart ? "node-start" : isFinish ? "node-finish": isWall ? "node-wall" : "";
+    const { row, col, isStart, isFinish, isWall, weight, onMouseDown, onMouseOver, onMouseUp } = this.props;
+    const cssClass = isStart ? "node-start" : isFinish ? "node-finish": isWall ? "node-wall" : weight === 2  ? "node-weight" : "";
 
     return (
       <div
