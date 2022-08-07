@@ -66,7 +66,12 @@ export default class Pathfinder extends Component {
   }
 
   handleMouseDown(row, col) {
+    const { row: startRow, col: startCol } = this.state.startNode;
+    const { row: finishRow, col: finishCol } = this.state.finishNode;
+    if (row === startRow && col === startCol) return;
+    if (row === finishRow && col === finishCol) return;
     this.setState({ mouseIsPressed: true });
+
     if (this.state.object === "Wall") {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid });
@@ -94,6 +99,10 @@ export default class Pathfinder extends Component {
 
   handleMouseEnter(row, col) {
     if (!this.state.mouseIsPressed) return;
+    const { row: startRow, col: startCol } = this.state.startNode;
+    const { row: finishRow, col: finishCol } = this.state.finishNode;
+    if (row === startRow && col === startCol) return;
+    if (row === finishRow && col === finishCol) return;
 
     if (this.state.object === "Wall") {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
@@ -216,7 +225,7 @@ export default class Pathfinder extends Component {
 
   handleGenerateMaze() {
     const { grid, startNode, finishNode } = this.state;
-    const visitedNodesInOrder = recursiveDivisionMaze(grid);
+    const visitedNodesInOrder = recursiveDivisionMaze(grid, startNode, finishNode);
     console.log(visitedNodesInOrder)
     for (let i = 0; i < visitedNodesInOrder.length; i++) {
       setTimeout(() => {
