@@ -37,7 +37,7 @@ function getRecursiveWalls(vertical, horizontal, grid, startNode, finishNode) {
   }
 
   if (dir === 0) {
-    addWall(dir, num, vertical, horizontal, startNode, finishNode);
+    addWall(dir, num, vertical, horizontal, startNode, finishNode, grid);
     getRecursiveWalls(
       vertical.slice(0, vertical.indexOf(num)),
       horizontal,
@@ -53,7 +53,7 @@ function getRecursiveWalls(vertical, horizontal, grid, startNode, finishNode) {
       finishNode
     );
   } else {
-    addWall(dir, num, vertical, horizontal, startNode, finishNode);
+    addWall(dir, num, vertical, horizontal, startNode, finishNode, grid);
     getRecursiveWalls(
       vertical,
       horizontal.slice(0, horizontal.indexOf(num)),
@@ -89,7 +89,7 @@ function generateOddRandomNumber(array) {
 //dir === 0 => Horizontal
 //dir === 1 => Vertical
 
-function addWall(dir, num, vertical, horizontal, startNode, finishNode) {
+function addWall(dir, num, vertical, horizontal, startNode, finishNode, grid) {
   let isStartFinish = false;
   let tempWalls = [];
   if (dir === 0) {
@@ -102,7 +102,7 @@ function addWall(dir, num, vertical, horizontal, startNode, finishNode) {
         isStartFinish = true;
         continue;
       }
-      tempWalls.push([temp, num]);
+      tempWalls.push(grid[temp][num]);
     }
   } else {
     if (vertical.length === 2) return;
@@ -114,7 +114,7 @@ function addWall(dir, num, vertical, horizontal, startNode, finishNode) {
         isStartFinish = true;
         continue;
       }
-      tempWalls.push([num, temp]);
+      tempWalls.push(grid[num][temp]);
     }
   }
   if (!isStartFinish) {
